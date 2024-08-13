@@ -386,11 +386,13 @@ def finetune(
         per_device_eval_batch_size=eval_batch_size,
         gradient_accumulation_steps=gradient_accumulation_steps,
         evaluation_strategy="epoch" if task == "glue" else "no",
-        save_strategy="epoch" if task == "glue" else "no",
+        # save_strategy="epoch" if task == "glue" else "no",
+        save_strategy="steps",
+        save_steps=5,
         metric_for_best_model=metric_for_best_model if task == "glue" else None,
         load_best_model_at_end=True if task == "glue" else False,
         logging_strategy="steps",
-        save_total_limit=1, # for GLUE, it will save 2 at max.
+        # save_total_limit=1, # for GLUE, it will save 2 at max.
         logging_steps=logging_steps,
         lr_scheduler_type=schedule,
         learning_rate=lr,
@@ -426,8 +428,7 @@ def finetune(
         json.dump(args_dict, json_file, indent=4)
 
     # save model
-    if save_model:
-        reft_model.save(f"{output_dir}/{run_name}")
+    reft_model.save(f"{output_dir}/{run_name}")
 
     # ensure everything is in eval mode
     reft_model.model.eval()
