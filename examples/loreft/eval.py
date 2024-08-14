@@ -1,9 +1,11 @@
+"""Evaluate trained ReFT models
+"""
+
 import argparse
 import json
 import os
 import shutil
 
-import torch
 from compute_metrics import compute_metrics
 from dataset import LoReftGLUEDataset, LoReftSupervisedDataset
 from task_config import task_config
@@ -68,6 +70,7 @@ def evaluate_model(
 
 
 def main():
+    """Run eval on trained ReFT model"""
     parser = argparse.ArgumentParser(
         description="Simple script for evaluating ReFT models at various checkpoints"
     )
@@ -163,10 +166,12 @@ def main():
     trigger_tokens = task_config[train_args["task"]]["trigger_tokens"]
 
     model_cfg_filename = os.path.join(logdir, "config.json")
-    for checkpoint in os.listdir(logdir):
+    checkpoint_dirs = [d for d in os.listdir(logdir) if "checkpoint-" in d]
+    checkpoint_dirs = sorted(checkpoint_dirs, key=lambda d: int(d.split("-")[1]))
+    for checkpoint in checkpoint_dirs:
         ckpt_dir = os.path.join(logdir, checkpoint, "intervenable_model")
-        # For some reason, `Trainer` doesn't save `config.json`, so we have to port this from the manual save at the top-level
-        # Note: this will fail unless you ran train.py with --save_model
+        # For some reason, `Trainer` doesn't save `config.json`, so we have to port this from the
+        # manual save at the top-level
         _ = shutil.copy(model_cfg_filename, ckpt_dir)
         evaluate_model(
             ckpt_dir,
