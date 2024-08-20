@@ -103,8 +103,10 @@ def main():
         # raw llama3
         print("adding a special padding token...")
         tokenizer.add_special_tokens({"pad_token": "[PAD]"})
+        need_resize = True
     else:
         tokenizer.pad_token = tokenizer.unk_token
+        need_resize = False
 
     model = AutoModelForCausalLM.from_pretrained(
         train_args["model"],
@@ -112,6 +114,9 @@ def main():
         load_in_8bit=True if dtype == "float8" else False,
         device_map=device,
     )
+
+    if need_resize:
+        model.resize_token_embeddings(len(tokenizer))
 
     # which layers to intervene on
     layers = train_args["layers"]
