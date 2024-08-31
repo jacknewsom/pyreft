@@ -419,6 +419,11 @@ def finetune(
         data_collator=data_collator,
         compute_metrics=in_training_compute_metrics if task == "glue" else None,
     )
+
+    # Save once before training
+    initial_ckpt_dir = os.path.join(output_dir, run_name, "checkpoint-0")
+    reft_model.save(initial_ckpt_dir)
+
     trainer.train()
 
     # dump config

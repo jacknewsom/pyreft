@@ -174,6 +174,7 @@ def main():
     checkpoint_dirs = [d for d in os.listdir(logdir) if "checkpoint-" in d]
     checkpoint_dirs = sorted(checkpoint_dirs, key=lambda d: int(d.split("-")[1]))
     for checkpoint in checkpoint_dirs:
+        print(f"Evaluating {checkpoint}")
         ckpt_dir = os.path.join(logdir, checkpoint, "intervenable_model")
         # For some reason, `Trainer` doesn't save `config.json`, so we have to port this from the
         # manual save at the top-level
